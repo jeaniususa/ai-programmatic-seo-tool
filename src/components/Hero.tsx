@@ -1,11 +1,14 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, User } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
   const [email, setEmail] = useState("");
+  const { user } = useAuth();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,21 +30,39 @@ const Hero = () => {
             to find the ones that actually boost rankings and drive traffic.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <form onSubmit={handleSubmit} className="flex gap-2 w-full max-w-md">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1"
-                required
-              />
-              <Button type="submit" className="whitespace-nowrap">
-                Get Free Guide <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </form>
-          </div>
+          {user ? (
+            <div className="flex flex-col items-center gap-4 mb-12">
+              <div className="flex items-center gap-2 text-lg text-primary">
+                <User className="h-5 w-5" />
+                <span>Welcome back, {user.email}!</span>
+              </div>
+              <p className="text-muted-foreground">
+                Ready to discover the best AI SEO tools for your business?
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+              <form onSubmit={handleSubmit} className="flex gap-2 w-full max-w-md">
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="flex-1"
+                  required
+                />
+                <Button type="submit" className="whitespace-nowrap">
+                  Get Free Guide <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </form>
+              <div className="text-sm text-muted-foreground">
+                or{" "}
+                <Link to="/auth" className="text-primary hover:underline">
+                  sign up for free
+                </Link>
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8 border-t border-border/50">
             <div className="text-center">
