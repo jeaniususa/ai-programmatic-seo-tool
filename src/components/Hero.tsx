@@ -1,21 +1,41 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowRight, User } from "lucide-react";
+import { ArrowRight, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
+import { toast } from "@/components/ui/use-toast";
 
 const Hero = () => {
   const [email, setEmail] = useState("");
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Email submitted:", email);
     // Toast notification for demo
-    alert("Thanks! We'll send you the latest AI SEO insights.");
+    toast({
+      title: "Thanks!",
+      description: "We'll send you the latest AI SEO insights.",
+    });
     setEmail("");
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Signed out",
+        description: "You have been signed out successfully.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to sign out",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -36,9 +56,13 @@ const Hero = () => {
                 <User className="h-5 w-5" />
                 <span>Welcome back, {user.email}!</span>
               </div>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground mb-4">
                 Ready to discover the best AI SEO tools for your business?
               </p>
+              <Button onClick={handleSignOut} variant="outline" className="flex items-center gap-2">
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
