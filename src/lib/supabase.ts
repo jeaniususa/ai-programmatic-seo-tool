@@ -26,7 +26,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
     }
   };
   
-  export const supabase = mockClient as any;
+  const supabase = mockClient as any;
 } else {
-  export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
 }

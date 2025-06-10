@@ -1,16 +1,50 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Newsletter signup:", email);
-    alert("Thanks for subscribing! You'll get our weekly AI SEO insights.");
-    setEmail("");
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase
+        .from('newsletter_subscriptions')
+        .insert([{ email }]);
+
+      if (error) {
+        // Check if it's a duplicate email error
+        if (error.code === '23505') {
+          toast({
+            title: "Already subscribed",
+            description: "This email is already subscribed to our newsletter.",
+            variant: "destructive",
+          });
+        } else {
+          throw error;
+        }
+      } else {
+        toast({
+          title: "Success!",
+          description: "Thanks for subscribing! You'll get our weekly AI SEO insights.",
+        });
+        setEmail("");
+      }
+    } catch (error: any) {
+      console.error("Newsletter signup error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to subscribe. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -34,9 +68,15 @@ const Footer = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 className="bg-gray-800 border-gray-700 text-white placeholder-gray-400"
                 required
+                disabled={isSubmitting}
               />
-              <Button type="submit" variant="outline" className="whitespace-nowrap border-gray-700 text-white hover:bg-gray-800">
-                Subscribe
+              <Button 
+                type="submit" 
+                variant="outline" 
+                className="whitespace-nowrap border-gray-700 text-white hover:bg-gray-800"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Subscribing..." : "Subscribe"}
               </Button>
             </form>
           </div>
