@@ -14,20 +14,24 @@ interface ScreenshotResponse {
   error?: string;
 }
 
+import { chromium } from 'playwright';
+
 export class ScreenshotService {
-  private static async callPlaywrightMCP(request: ScreenshotRequest): Promise<ScreenshotResponse> {
+  static async callPlaywrightMCP(request: ScreenshotRequest): Promise<ScreenshotResponse> {
     try {
-      // This would integrate with your Playwright MCP
-      // For now, we'll simulate the response structure
-      console.log(`Capturing screenshot for ${request.toolName} at ${request.url}`);
-      
-      // Simulate MCP call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Return simulated response - in real implementation, this would be the actual MCP response
+      const browser = await chromium.launch();
+      const page = await browser.newPage();
+      await page.goto(request.url, { waitUntil: 'networkidle' });
+
+      const sanitizedName = request.toolName.toLowerCase().replace(/\s+/g, '-');
+      const imagePath = `public/screenshots/${sanitizedName}-screenshot.png`;
+
+      await page.screenshot({ path: imagePath, fullPage: true });
+      await browser.close();
+
       return {
         success: true,
-        imagePath: `screenshots/${request.toolName.toLowerCase().replace(/\s+/g, '-')}-screenshot.png`
+        imagePath: `/screenshots/${sanitizedName}-screenshot.png`
       };
     } catch (error) {
       console.error('Screenshot capture failed:', error);
@@ -37,7 +41,7 @@ export class ScreenshotService {
       };
     }
   }
-
+}
   static async captureToolScreenshot(toolName: string, url: string): Promise<ScreenshotResponse> {
     const request: ScreenshotRequest = {
       url,
