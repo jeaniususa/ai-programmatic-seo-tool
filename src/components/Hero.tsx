@@ -5,7 +5,7 @@ import { ArrowRight, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 const Hero = () => {
   const [email, setEmail] = useState("");
